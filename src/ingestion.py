@@ -1,6 +1,7 @@
 import os
 import glob
 import time
+import re
 from pathlib import Path
 from pypdf import PdfReader
 import chromadb
@@ -49,18 +50,27 @@ def extrair_texto_markdown(caminho_md: str) -> list[dict]:
         }]
     return []
 
-def criar_chunks(documentos_paginas: list[dict], chunk_size: int = 700, chunk_overlap: int = 100) -> list[dict]:
-    """Divide os textos em blocos com sobreposicao (overlap) para manter contexto."""
+def criar_chunks(documentos_paginas: list[dict], chunk_size: int = 1000, chunk_overlap: int = 200) -> list[dict]:
+    """Divide os textos em blocos, priorizando o fim de frases."""
     chunks = []
-    
+
     for item in documentos_paginas:
         texto = item["texto"]
-        inicio = 0
+        frases = [parte.strip() for parte in re.split(r"(?<=[.!?])\s+", texto) if parte.strip()]
+        inicio_frase = 0
         chunk_idx = 1
-        
-        while inicio < len(texto):
-            fim = inicio + chunk_size
-            trecho = texto[inicio:fim]
+
+        while inicio_frase < len(frases):
+            fim_frase = inicio_frase
+            tamanho = 0
+            while fim_frase < len(frases):
+                tamanho_adicional = len(frases[fim_frase]) + (1 if fim_frase > inicio_frase else 0)
+                if fim_frase > inicio_frase and tamanho + tamanho_adicional > chunk_size:
+                    break
+                tamanho += tamanho_adicional
+                fim_frase += 1
+
+            trecho = " ".join(frases[inicio_frase:fim_frase])
             
             chunk_id = f"{item['arquivo']}_p{item['pagina']}_c{chunk_idx}"
             chunks.append({
@@ -70,10 +80,16 @@ def criar_chunks(documentos_paginas: list[dict], chunk_size: int = 700, chunk_ov
                 "pagina": item["pagina"],
                 "chunk_idx": chunk_idx
             })
-            
-            inicio += (chunk_size - chunk_overlap)
+
+            proxima_frase = fim_frase
+            tamanho_overlap = 0
+            while proxima_frase > inicio_frase and tamanho_overlap < chunk_overlap:
+                proxima_frase -= 1
+                tamanho_overlap += len(frases[proxima_frase]) + 1
+
+            inicio_frase = proxima_frase if proxima_frase > inicio_frase else fim_frase
             chunk_idx += 1
-            
+
     return chunks
 
 def indexar_no_chromadb(chunks: list[dict], path_db: str = "./chroma_db", collection_name: str = "askdata_knowledge"):
@@ -117,7 +133,7 @@ def indexar_no_chromadb(chunks: list[dict], path_db: str = "./chroma_db", collec
                 )
                 
                 # Pausa de 0.7s por chunk: mantem ~85 req/min (abaixo do teto gratuito de 100/min)
-                time.sleep(0.7)
+                time.sleep(0.2)
                 break
                 
             except Exception as e:
@@ -152,6 +168,6 @@ if __name__ == "__main__":
         print("Nenhum arquivo PDF ou Markdown encontrado em ./data! Adicione arquivos na pasta para testar.")
     else:
         # 3. Gerar Chunks
-        lista_chunks = criar_chunks(todos_documentos, chunk_size=700, chunk_overlap=100)
+        lista_chunks = criar_chunks(todos_documentos, chunk_size=1000, chunk_overlap=200)
         # 4. Indexar no ChromaDB
         indexar_no_chromadb(lista_chunks)

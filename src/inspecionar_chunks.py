@@ -60,12 +60,12 @@ print("\n--- Analise de Cortes de Frase ---")
 print(f"Chunks sem pontuacao final: {len(chunks_cortados)} de {total_chunks} ({len(chunks_cortados)/total_chunks*100:.1f}%)")
 
 if chunks_cortados:
-    print("\nExemplos de chunks cortados no meio da frase:")
-    for cid, texto, meta in chunks_cortados[:3]:
+    print("\nTodos os chunks cortados no meio da frase:")
+    for numero, (cid, texto, meta) in enumerate(chunks_cortados, 1):
         fim_trecho = texto[-60:].replace("\n", " ")
-        print(f"  [ID: {cid}] Arquivo: {meta.get('arquivo')}, Pag: {meta.get('pagina')}")
+        print(f"  {numero}. [ID: {cid}] Arquivo: {meta.get('arquivo')}, Pag: {meta.get('pagina')}")
         print(f"    Final do texto: \"...{fim_trecho}\"")
         print("    " + "-" * 50)
 
-print("\nAuditoria concluida. Discutam no trio se o overlap de 100 caracteres")
-print("preserva o contexto semantico ou se os parametros precisam ser calibrados.")
+print("\nAuditoria concluida. O overlap configurado na ingestao e de 200 caracteres")
+print("aproximados, priorizando a preservacao de frases completas.")
