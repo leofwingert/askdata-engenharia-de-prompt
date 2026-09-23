@@ -1,40 +1,71 @@
-# 🤖 AskData Enterprise: Base de Conhecimento RAG Auditável
+# AskData
 
-Assistente corporativo de alta fidelidade factual baseado em **Retrieval-Augmented Generation (RAG Local)** para consulta, análise e explicabilidade de documentações técnicas de Engenharia de Prompt e diretrizes institucionais do TCESP.
+Assistente de perguntas e respostas baseado em RAG, desenvolvido para o tema
+**Engenharia de Prompt**.
 
-Projeto desenvolvido para a **Sprint 1** da parceria **DataLakers & Navi Hub (Tecnopuc)**.
+## Integrantes
 
----
+- Leonardo
+- Marcos
 
-## 👥 Equipe
-* **Leonardo**
-* **Marcos Vinícius**
+## Domínio dos dados indexados
 
----
+A base de conhecimento reúne documentos técnicos sobre engenharia de prompt,
+incluindo:
 
-## 🏗️ Arquitetura do Sistema
+- a matriz PACIF (Papel, Ação, Contexto, Intenção e Formato);
+- o projeto ANIA.core e seus módulos do TCESP;
+- técnicas como Chain of Thought e Few-Shot Prompting;
+- elementos para estruturar prompts eficazes.
 
-```mermaid
-flowchart TD
-    subgraph INGESTÃO [Pipeline Offline de Ingestão]
-        A[PDFs Técnicos /data] --> B[pypdf: Extração por Página]
-        B --> C[Regex Chunking: Sentenças e Tail-Merging]
-        C --> D[gemini-embedding-001]
-        D --> E[(ChromaDB: Espaço Cosseno)]
-    end
+Os documentos são carregados da pasta `data/`, transformados em chunks e
+indexados no ChromaDB com embeddings do modelo `gemini-embedding-001`.
 
-    subgraph INFERÊNCIA [Motor Online de Recuperação e Síntese]
-        F[Pergunta do Usuário] --> G[Embedding da Query]
-        G --> H[Busca Top-K no ChromaDB]
-        E -. Similaridade .-> H
-        H --> I[Prompt Blindado + Contexto XML]
-        I --> J[gemini-3.5-flash-lite: Temp 0.1]
-        J --> K[Resposta com Citação de Página]
-    end
+## Execução rápida
 
-    subgraph INTERFACE [Streamlit Enterprise Frontend]
-        K --> L[Chat Reativo + Streaming]
-        H --> M[Explicabilidade & Telemetria Vetorial]
-        J --> N[Tracker FinOps: Tokens e Custo USD]
-        E --> O[Dashboard de Auditoria da Base]
-    end
+Execute os comandos a partir da raiz do projeto.
+
+### 1. Criar e ativar o ambiente virtual
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+No Windows, use:
+
+```powershell
+.venv\Scripts\activate
+```
+
+### 2. Instalar as dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+Crie um arquivo `.env` na raiz do projeto e informe sua chave da API do
+Gemini:
+
+```env
+GEMINI_API_KEY=sua_chave_aqui
+```
+
+### 3. Executar a ingestão
+
+Coloque os arquivos PDF ou Markdown na pasta `data/` e execute:
+
+```bash
+python src/ingestion.py
+```
+
+Esse comando extrai o texto, cria os chunks e persiste os embeddings em
+`chroma_db/`.
+
+### 4. Iniciar a aplicação Streamlit
+
+```bash
+streamlit run src/app.py
+```
+
+Depois, abra no navegador o endereço local exibido pelo Streamlit.
