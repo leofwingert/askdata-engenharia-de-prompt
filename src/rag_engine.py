@@ -11,13 +11,13 @@ api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     raise ValueError("GEMINI_API_KEY não encontrada no arquivo .env!")
 
-# Modelos oficiais gratuitos do Google AI Studio
+# Modelos oficiais
 EMBEDDING_MODEL = "gemini-embedding-001"
-MODELO_FLASH = "gemini-3.5-flash-lite"  # Modelo Gemini
+MODELO_GERACAO = "gemini-3.5-flash-lite"
 
 class RAGEngine:
     def __init__(self, path_db: str = "./chroma_db", collection_name: str = "askdata_knowledge"):
-        """Inicializa a conexão com o ChromaDB e o cliente Gemini."""
+        """Inicializa a conexão local persistente com o ChromaDB e o cliente Gemini."""
         self.client = genai.Client(api_key=api_key)
         self.chroma_client = chromadb.PersistentClient(path=path_db)
         self.collection = self.chroma_client.get_or_create_collection(
@@ -26,7 +26,7 @@ class RAGEngine:
         )
 
     def _gerar_embedding(self, texto: str) -> List[float]:
-        """Gera o embedding da pergunta do usuário."""
+        """Gera o embedding numérico da pergunta do usuário."""
         res = self.client.models.embed_content(
             model=EMBEDDING_MODEL,
             contents=texto
@@ -34,7 +34,7 @@ class RAGEngine:
         return res.embeddings[0].values
 
     def recuperar_contexto(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
-        """Busca no ChromaDB os top_k chunks mais relevantes para a query."""
+        """Recupera os top_k trechos mais próximos via similaridade de cosseno."""
         vetor_query = self._gerar_embedding(query)
         
         resultados = self.collection.query(
@@ -43,7 +43,7 @@ class RAGEngine:
         )
         
         chunks_recuperados = []
-        if resultados and resultados["documents"] and resultados["documents"][0]:
+        if resultados and resultados.get("documents") and resultados["documents"][0]:
             for doc, meta, dist in zip(
                 resultados["documents"][0],
                 resultados["metadatas"][0],
@@ -51,7 +51,7 @@ class RAGEngine:
             ):
                 chunks_recuperados.append({
                     "texto": doc,
-                    "arquivo": meta.get("arquivo", "desconhecido"),
+                    "arquivo": meta.get("arquivo", "documento_desconhecido"),
                     "pagina": meta.get("pagina", 1),
                     "distancia": dist,
                     "similaridade": round(1.0 - dist, 4)
@@ -59,35 +59,37 @@ class RAGEngine:
         return chunks_recuperados
 
     def responder_pergunta(self, query: str, top_k: int = 3) -> Dict[str, Any]:
-        """Executa o pipeline RAG completo: Retrieval -> Prompt Augmentation -> Generation."""
+        """Executa o pipeline RAG: Recuperação -> Montagem de Contexto -> Síntese Blindada."""
         # 1. Recuperar contexto do banco vetorial
         chunks = self.recuperar_contexto(query, top_k=top_k)
         
         if not chunks:
             return {
-                "resposta": "Nenhum documento encontrado na base de conhecimento. Por favor, processe arquivos primeiro.",
+                "resposta": "Desculpe, não encontrei informações sobre isso nos documentos fornecidos.",
                 "fontes": []
             }
 
-        # 2. Formatar o contexto recuperado com marcação de origem
+        # 2. Formatar o contexto com identificação clara de fonte e página
         contexto_formatado = ""
         for idx, ch in enumerate(chunks, 1):
             contexto_formatado += f"\n--- [FONTE {idx} | Arquivo: {ch['arquivo']} | Página: {ch['pagina']}] ---\n"
             contexto_formatado += ch["texto"] + "\n"
 
-        # 3. System Instruction blindado contra alucinações
+        # 3. System Instruction rigoroso para ancoragem factual (Grounding)
         system_instruction = """
-Você é o 'AskData', um assistente corporativo de inteligência artificial da DataLakers.
-Sua missão é responder à pergunta do usuário de forma clara, profissional e EXCLUSIVAMENTE baseada nos trechos de documentos fornecidos no contexto.
+Você é o 'AskData', assistente de base de conhecimento da DataLakers.
+Sua missão é responder à pergunta do usuário EXCLUSIVAMENTE com base nos trechos fornecidos em <contexto_recuperado>.
 
-REGRAS OBRIGATÓRIAS:
-1. Responda apenas com informações presentes no <contexto_recuperado>.
-2. Se a resposta NÃO estiver no contexto fornecido, NÃO tente inventar ou usar conhecimentos externos. Responda exatamente: "Desculpe, não encontrei informações sobre isso nos documentos fornecidos."
-3. Ao responder, cite o nome do arquivo e a página de onde a informação foi extraída.
-4. Mantenha um tom profissional, direto e em bom português.
+REGRAS OBRIGATÓRIAS DE OPERAÇÃO:
+1. Responda apenas com fatos explicitamente descritos no <contexto_recuperado>.
+2. Se a informação NÃO estiver presente nos trechos fornecidos, você DEVE responder exatamente a seguinte frase, sem variações:
+"Desculpe, não encontrei informações sobre isso nos documentos fornecidos."
+3. NUNCA tente inventar, assumir, deduzir ou utilizar conhecimentos externos de pré-treino.
+4. Para cada afirmação feita, cite explicitamente o nome do arquivo e a página de onde o fato foi extraído (ex: "[Manual_TCESP.pdf, p. 6]").
+5. Responda de forma direta, técnica, profissional e em bom português.
 """
 
-        # 4. Prompt com delimitadores
+        # 4. Prompt estruturado com delimitadores XML para evitar injeções
         prompt_final = f"""
 <contexto_recuperado>
 {contexto_formatado}
@@ -98,9 +100,9 @@ REGRAS OBRIGATÓRIAS:
 </pergunta_do_usuario>
 """
 
-        # 5. Chamada ao Modelo Gemini com temperatura baixa (0.1)
+        # 5. Inferência com temperatura baixa (0.1) para fidelidade factual
         response = self.client.models.generate_content(
-            model=MODELO_FLASH,
+            model=MODELO_GERACAO,
             contents=prompt_final,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction,
@@ -116,13 +118,13 @@ REGRAS OBRIGATÓRIAS:
 if __name__ == "__main__":
     engine = RAGEngine()
     
-    print("=" * 60)
-    print("TESTE DO MOTOR RAG (Terminal)")
-    print("=" * 60)
+    print("=" * 65)
+    print("TESTE INTERATIVO DO MOTOR RAG (Terminal)")
+    print("=" * 65)
     
     while True:
-        pergunta = input("\nFaça uma pergunta sobre seus documentos ('sair' para encerrar): ").strip()
-        if pergunta.lower() in ["sair", "exit"]:
+        pergunta = input("\nDigite sua pergunta técnica ('sair' para encerrar): ").strip()
+        if pergunta.lower() in ["sair", "exit", "quit"]:
             break
         if not pergunta:
             continue
@@ -132,8 +134,6 @@ if __name__ == "__main__":
         print("\nRESPOSTA DO ASSISTENTE:")
         print(resultado["resposta"])
         
-        print("\nFONTES UTILIZADAS (Metadados do ChromaDB):")
+        print("\nFONTES RESGATADAS:")
         for f in resultado["fontes"]:
-            print(f"  - {f['arquivo']} (Página {f['pagina']}) - Similaridade: {f['similaridade']:.2%}")
-
-# Dica de Engenharia: Se algo nao funcionar de primeira, leia o traceback e debugar faz parte do projeto!
+            print(f"  * {f['arquivo']} (Página {f['pagina']}) - Similaridade: {f['similaridade']:.2%}")
