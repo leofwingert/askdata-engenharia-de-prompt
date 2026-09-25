@@ -65,111 +65,84 @@ st.markdown("""
     }
 
     /* ========================================================
-       BARRA LATERAL FIXA COM TOPO E RODAPÉ ANCORADOS
+       BARRA LATERAL TOTALMENTE DESACOPLADA
        ======================================================== */
     [data-testid="stSidebar"] {
         background-color: var(--sidebar-surface) !important;
         border-right: 1px solid var(--border-glass) !important;
+        z-index: 100 !important;
     }
-    [data-testid="stSidebarContent"] {
-        padding-top: 0 !important;
-        padding-left: 0.8rem !important;
-        padding-right: 0.8rem !important;
-        padding-bottom: 0.8rem !important;
+    [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
+        padding: 0.6rem 0.8rem 1rem 0.8rem !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
         height: 100vh !important;
-        overflow-y: auto !important;
     }
 
-    /* Topo Elevado e Isolado (Sem Oscilação) */
-    .sidebar-brand-fixed {
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        background: var(--sidebar-surface);
-        padding: 0.4rem 0 0.8rem 0;
-        margin-top: -1.2rem;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+    /* Topo Limpo e Fixo */
+    .sidebar-brand-box {
         display: flex;
         align-items: center;
         gap: 10px;
+        padding-bottom: 0.8rem;
+        margin-bottom: 0.6rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
     }
     .brand-icon-box {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         background: linear-gradient(135deg, #059669, #10B981);
         border-radius: 8px;
         display: grid;
         place-items: center;
         font-weight: 700;
         color: #07090C;
-        font-size: 14px;
+        font-size: 15px;
         flex-shrink: 0;
     }
 
-    /* Botão de Reabrir a Barra Lateral */
-    [data-testid="stSidebarCollapsedControl"] {
-        display: flex !important;
-        visibility: visible !important;
-        align-items: center !important;
-        top: 12px !important;
-        left: 12px !important;
-        background: var(--card-surface) !important;
-        border: 1px solid var(--emerald-border) !important;
-        border-radius: 8px !important;
-        color: var(--emerald-primary) !important;
-        z-index: 1000 !important;
-    }
-    [data-testid="stSidebarCollapsedControl"] svg {
-        fill: var(--emerald-primary) !important;
-    }
-
-    /* MINI-RAIL PERSISTENTE NA LATERAL ESQUERDA (BARRA RECOLHIDA) */
+    /* MINI-RAIL PERSISTENTE (APARECE QUANDO A BARRA LATERAL FECHA) */
     .collapsed-mini-rail {
-        display: none;
         position: fixed;
-        left: 12px;
-        top: 50px;
-        bottom: 16px;
-        width: 36px;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 52px;
+        background: var(--sidebar-surface);
+        border-right: 1px solid var(--border-glass);
+        display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        z-index: 999;
-        pointer-events: none;
-    }
-    [data-testid="stSidebar"][aria-expanded="false"] ~ section.main .collapsed-mini-rail {
-        display: flex !important;
+        padding: 52px 0 18px 0;
+        z-index: 40;
     }
     .rail-badge-top {
         background: var(--card-surface);
         border: 1px solid var(--emerald-border);
         border-radius: 8px;
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
         display: grid;
         place-items: center;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: var(--emerald-primary);
-        pointer-events: auto;
     }
     .rail-dock-bottom {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
-        pointer-events: auto;
+        gap: 14px;
     }
 
-    /* Rodapé da Barra Lateral Expandida (Estilo Gemini) */
+    /* Rodapé da Barra Lateral Expandida (Alinhado à Esquerda - Estilo Gemini) */
     .sidebar-bottom-actions {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        padding: 14px 0 6px 0;
+        align-items: flex-start !important;
+        padding-left: 10px !important;
+        gap: 14px;
+        padding-top: 16px;
         margin-top: auto;
         border-top: 1px solid var(--border-glass);
     }
@@ -249,7 +222,7 @@ st.markdown("""
     .metric-title { font-size: 0.68rem; text-transform: uppercase; color: var(--text-subtle); font-weight: 700; letter-spacing: 0.08em; }
     .metric-val { font-size: 1.1rem; font-weight: 700; color: var(--text-headline); margin-top: 2px; }
 
-    /* HERO STATE COMPACTO */
+    /* HERO STATE */
     .hero-wrapper {
         text-align: center;
         padding: 1.5rem 1rem 1.2rem;
@@ -345,7 +318,7 @@ st.markdown("""
     .executive-cost { color: var(--emerald-primary); font-weight: 600; }
 
     /* =========================================================================
-       CÁPSULA PERPLEXITY RECONSTRUÍDA: LINHA ÚNICA CENTRALIZADA (800px)
+       CÁPSULA PERPLEXITY DOCK: 800px COM POSICIONAMENTO RIGOROSO DOS 4 ELEMENTOS
        ========================================================================= */
     div[data-testid="stBottom"] {
         background: transparent !important;
@@ -358,103 +331,149 @@ st.markdown("""
         max-width: 800px !important;
         margin: 0 auto 16px auto !important;
         padding: 0 !important;
+        position: relative !important;
     }
 
-    /* Container Flex Único para os 3 Elementos */
+    /* O Frame Único da Cápsula com 52px de Altura */
     div[data-testid="stBottom"] [data-testid="stVerticalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 800px !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        max-height: 52px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
         background: #111418 !important;
         border: 1.5px solid var(--emerald-border) !important;
         border-radius: 28px !important;
-        padding: 4px 10px !important;
-        box-shadow: 0 0 22px rgba(16, 185, 129, 0.16), 0 8px 30px rgba(0, 0, 0, 0.7) !important;
-        gap: 8px !important;
-        width: 100% !important;
+        box-shadow: 0 0 24px rgba(16, 185, 129, 0.16), 0 8px 32px rgba(0, 0, 0, 0.7) !important;
         box-sizing: border-box !important;
+        transition: all 0.22s ease-in-out !important;
     }
     div[data-testid="stBottom"] [data-testid="stVerticalBlock"]:focus-within {
         border-color: rgba(16, 185, 129, 0.85) !important;
-        box-shadow: 0 0 32px rgba(16, 185, 129, 0.24), 0 10px 38px rgba(0, 0, 0, 0.8) !important;
+        box-shadow: 0 0 32px rgba(16, 185, 129, 0.26), 0 10px 40px rgba(0, 0, 0, 0.8) !important;
     }
 
-    /* Reset Geral de Larguras dos Containers Internos */
-    div[data-testid="stBottom"] [data-testid="element-container"] {
-        width: auto !important;
+    /* 1. Botão '+' Embutido na Esquerda Interna */
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type {
+        position: absolute !important;
+        left: 14px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 30 !important;
+        width: 32px !important;
+        height: 32px !important;
         margin: 0 !important;
         padding: 0 !important;
-        flex: 0 0 auto !important;
     }
-
-    /* 1. Botão '+' no início da linha */
-    div[data-testid="stBottom"] [data-testid="element-container"]:first-of-type div[data-testid="stPopover"] > button {
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type button {
         background: transparent !important;
         border: none !important;
+        box-shadow: none !important;
         color: var(--emerald-primary) !important;
-        font-size: 1.35rem !important;
-        width: 34px !important;
-        height: 34px !important;
+        font-size: 1.45rem !important;
+        font-weight: 300 !important;
+        width: 32px !important;
+        height: 32px !important;
         padding: 0 !important;
         display: grid !important;
         place-items: center !important;
         border-radius: 50% !important;
         transition: all 0.18s ease !important;
     }
-    div[data-testid="stBottom"] [data-testid="element-container"]:first-of-type div[data-testid="stPopover"] > button:hover {
-        background: rgba(16, 185, 129, 0.15) !important;
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type button svg {
+        display: none !important; /* Remove a setinha ▾ do popover */
+    }
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type button:hover {
+        background: rgba(16, 185, 129, 0.18) !important;
         color: #34D399 !important;
         transform: scale(1.1) !important;
     }
 
-    /* 2. Campo de Chat ocupando todo o espaço central */
+    /* 2. Campo de Chat Preenchendo Toda a Cápsula com Recuos Perfeitos */
     div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stChatInput"]) {
-        flex: 1 1 auto !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
         width: 100% !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 10 !important;
     }
-    [data-testid="stChatInput"] {
+    div[data-testid="stBottom"] [data-testid="stChatInput"] {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
+        height: 100% !important;
     }
-    [data-testid="stChatInput"] > div {
+    div[data-testid="stBottom"] [data-testid="stChatInput"] > div {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
     }
-    [data-testid="stChatInput"] textarea {
+    div[data-testid="stBottom"] [data-testid="stChatInput"] textarea {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         color: #F8FAFC !important;
         font-size: 0.92rem !important;
-        padding: 8px 8px !important;
-        min-height: 44px !important;
+        height: 50px !important;
+        min-height: 50px !important;
+        max-height: 50px !important;
+        padding-left: 52px !important;     /* Folga confortável após o '+' */
+        padding-right: 175px !important;   /* Folga antes do botão de modelo e envio */
+        padding-top: 13px !important;
+        padding-bottom: 13px !important;
         box-sizing: border-box !important;
     }
 
-    /* 3. Seletor de Modelo compacto no lado direito */
-    div[data-testid="stBottom"] [data-testid="element-container"]:last-of-type div[data-testid="stPopover"] > button {
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    /* Seta de Envio Nativa Fixada à Direita Interna */
+    div[data-testid="stBottom"] [data-testid="stChatInputSubmitButton"] {
+        position: absolute !important;
+        right: 14px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 30 !important;
+    }
+
+    /* 3. Seletor de Modelo Posicionado Antes da Seta de Envio */
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):last-of-type {
+        position: absolute !important;
+        right: 50px !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        z-index: 30 !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):last-of-type button {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         color: #CBD5E1 !important;
         font-size: 0.74rem !important;
         font-weight: 600 !important;
-        height: 30px !important;
-        padding: 0 10px !important;
-        border-radius: 8px !important;
+        height: 28px !important;
+        padding: 0 9px !important;
+        border-radius: 6px !important;
         display: flex !important;
         align-items: center !important;
         gap: 4px !important;
         white-space: nowrap !important;
         transition: all 0.18s ease !important;
     }
-    div[data-testid="stBottom"] [data-testid="element-container"]:last-of-type div[data-testid="stPopover"] > button:hover {
-        background: rgba(16, 185, 129, 0.12) !important;
+    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):last-of-type button:hover {
+        background: rgba(16, 185, 129, 0.14) !important;
         border-color: var(--emerald-border) !important;
         color: var(--emerald-primary) !important;
     }
@@ -598,7 +617,7 @@ def listar_documentos() -> list[Path]:
 # 7. Mini-Rail Visível Quando a Barra Lateral é Recolhida (Estilo Gemini)
 st.markdown("""
 <div class="collapsed-mini-rail">
-    <div class="rail-badge-top">⚡</div>
+    <div class="rail-badge-top" title="AskData">⚡</div>
     <div class="rail-dock-bottom">
         <div class="action-gear" title="Configurações">⚙️</div>
         <div class="action-avatar" title="Usuário Ativo">
@@ -611,9 +630,9 @@ st.markdown("""
 
 # 8. Barra Lateral Expandida
 with st.sidebar:
-    # Topo Elevado e Fixo (Não oscila ao abrir/fechar o expander)
+    # Topo Estático e Limpo (Sem margem negativa, sem oscilação)
     st.markdown("""
-    <div class="sidebar-brand-fixed">
+    <div class="sidebar-brand-box">
         <div class="brand-icon-box">⚡</div>
         <div>
             <div style="font-weight: 700; font-size: 0.95rem; letter-spacing: -0.02em; color: #F8FAFC;">AskData</div>
@@ -676,7 +695,7 @@ with st.sidebar:
                 use_container_width=True
             )
 
-    # Rodapé da Barra Lateral Expandida (Estilo Gemini)
+    # Rodapé da Barra Lateral Expandida (Estilo Gemini: Alinhado à Esquerda)
     st.markdown("""
     <div class="sidebar-bottom-actions">
         <div class="action-gear" title="Configurações">⚙️</div>
@@ -766,9 +785,9 @@ else:
 if tag_escopo_html:
     st.markdown(tag_escopo_html, unsafe_allow_html=True)
 
-# 11. CÁPSULA UNIFICADA: '+' (ESQ) | ENTRADA (CENTRO) | MODELO (DIR)
+# 11. CÁPSULA PERPLEXITY UNIFICADA (800px COM '+' NA ESQ E MODELO NA DIR)
 with st.bottom:
-    # 1. BOTÃO '+' (SELETOR DE FONTES - SEM TOOLTIP DE HOVER)
+    # 1. BOTÃO '+' (SELETOR DE FONTES - SEM TOOLTIP E SEM BORDA QUADRADA)
     with st.popover("＋"):
         st.markdown('<div class="popover-header">Fontes de Consulta</div>', unsafe_allow_html=True)
         st.markdown('<div class="popover-desc">Selecione uma ou mais bases para direcionar a busca semântica:</div>', unsafe_allow_html=True)
@@ -815,7 +834,7 @@ with st.bottom:
     # 2. CAMPO DE DIGITAÇÃO NO CENTRO
     prompt_digitado = st.chat_input("Consulte qualquer norma, procedimento ou técnica...")
 
-    # 3. SELETOR DE MODELO À DIREITA
+    # 3. SELETOR DE MODELO À DIREITA (ANTES DA SETA DE ENVIO)
     modelo_atual_info = OPCOES_MODELOS[st.session_state.modelo_selecionado]
     with st.popover(f"⚡ {modelo_atual_info['label']} ▾"):
         st.markdown('<div class="popover-header">Modelo de Linguagem</div>', unsafe_allow_html=True)
