@@ -11,7 +11,6 @@ api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
     raise ValueError("GEMINI_API_KEY não encontrada no arquivo .env!")
 
-# Modelos oficiais
 EMBEDDING_MODEL = "gemini-embedding-001"
 MODELO_GERACAO = "gemini-3.5-flash-lite"
 
@@ -33,7 +32,7 @@ class RAGEngine:
         )
         return res.embeddings[0].values
 
-    def recuperar_contexto(self, query: str, top_k: int = 3) -> List[Dict[str, Any]]:
+    def recuperar_contexto(self, query: str, top_k: int = 4) -> List[Dict[str, Any]]:
         """Recupera os top_k trechos mais próximos via similaridade de cosseno."""
         vetor_query = self._gerar_embedding(query)
         
@@ -58,9 +57,8 @@ class RAGEngine:
                 })
         return chunks_recuperados
 
-    def responder_pergunta(self, query: str, top_k: int = 3) -> Dict[str, Any]:
+    def responder_pergunta(self, query: str, top_k: int = 4) -> Dict[str, Any]:
         """Executa o pipeline RAG: Recuperação -> Montagem de Contexto -> Síntese Blindada."""
-        # 1. Recuperar contexto do banco vetorial
         chunks = self.recuperar_contexto(query, top_k=top_k)
         
         if not chunks:
@@ -69,27 +67,24 @@ class RAGEngine:
                 "fontes": []
             }
 
-        # 2. Formatar o contexto com identificação clara de fonte e página
         contexto_formatado = ""
         for idx, ch in enumerate(chunks, 1):
             contexto_formatado += f"\n--- [FONTE {idx} | Arquivo: {ch['arquivo']} | Página: {ch['pagina']}] ---\n"
             contexto_formatado += ch["texto"] + "\n"
 
-        # 3. System Instruction rigoroso para ancoragem factual (Grounding)
         system_instruction = """
 Você é o 'AskData', assistente de base de conhecimento da DataLakers.
 Sua missão é responder à pergunta do usuário EXCLUSIVAMENTE com base nos trechos fornecidos em <contexto_recuperado>.
 
 REGRAS OBRIGATÓRIAS DE OPERAÇÃO:
-1. Responda apenas com fatos explicitamente descritos no <contexto_recuperado>.
-2. Se a informação NÃO estiver presente nos trechos fornecidos, você DEVE responder exatamente a seguinte frase, sem variações:
+1. Responda apenas com fatos descritos no <contexto_recuperado>. Se a pergunta comparar conceitos e eles estiverem descritos nos trechos, você pode sintetizar e contrastar com base nas definições fornecidas.
+2. Se o tema principal da pergunta NÃO constar nos trechos fornecidos, você DEVE responder exatamente a seguinte frase:
 "Desculpe, não encontrei informações sobre isso nos documentos fornecidos."
-3. NUNCA tente inventar, assumir, deduzir ou utilizar conhecimentos externos de pré-treino.
-4. Para cada afirmação feita, cite explicitamente o nome do arquivo e a página de onde o fato foi extraído (ex: "[Manual_TCESP.pdf, p. 6]").
+3. NUNCA tente inventar, deduzir sem respaldo ou utilizar conhecimentos externos de pré-treino.
+4. Para cada ponto abordado, cite explicitamente o nome do arquivo e a página de onde o fato foi extraído (ex: "[Manual_TCESP.pdf, p. 6]").
 5. Responda de forma direta, técnica, profissional e em bom português.
 """
 
-        # 4. Prompt estruturado com delimitadores XML para evitar injeções
         prompt_final = f"""
 <contexto_recuperado>
 {contexto_formatado}
@@ -100,7 +95,6 @@ REGRAS OBRIGATÓRIAS DE OPERAÇÃO:
 </pergunta_do_usuario>
 """
 
-        # 5. Inferência com temperatura baixa (0.1) para fidelidade factual
         response = self.client.models.generate_content(
             model=MODELO_GERACAO,
             contents=prompt_final,
@@ -114,26 +108,3 @@ REGRAS OBRIGATÓRIAS DE OPERAÇÃO:
             "resposta": response.text.strip(),
             "fontes": chunks
         }
-
-if __name__ == "__main__":
-    engine = RAGEngine()
-    
-    print("=" * 65)
-    print("TESTE INTERATIVO DO MOTOR RAG (Terminal)")
-    print("=" * 65)
-    
-    while True:
-        pergunta = input("\nDigite sua pergunta técnica ('sair' para encerrar): ").strip()
-        if pergunta.lower() in ["sair", "exit", "quit"]:
-            break
-        if not pergunta:
-            continue
-            
-        resultado = engine.responder_pergunta(pergunta, top_k=3)
-        
-        print("\nRESPOSTA DO ASSISTENTE:")
-        print(resultado["resposta"])
-        
-        print("\nFONTES RESGATADAS:")
-        for f in resultado["fontes"]:
-            print(f"  * {f['arquivo']} (Página {f['pagina']}) - Similaridade: {f['similaridade']:.2%}")
