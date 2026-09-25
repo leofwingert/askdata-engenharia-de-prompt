@@ -20,10 +20,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 2. Design System Enterprise (Perplexity Dark Emerald Edition)
+# 2. Design System Enterprise - Pixel Perfect Compact Gemini Dock
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
     :root {
         --bg-canvas: #090B0E;
@@ -31,13 +31,13 @@ st.markdown("""
         --card-surface: #111418;
         --card-hover: #161A20;
         --menu-surface: #101317;
-        --border-glass: rgba(255, 255, 255, 0.06);
+        --border-glass: rgba(255, 255, 255, 0.07);
         --text-headline: #F8FAFC;
         --text-body: #94A3B8;
         --text-subtle: #64748B;
         --emerald-primary: #10B981;
         --emerald-glow: rgba(16, 185, 129, 0.16);
-        --emerald-border: rgba(16, 185, 129, 0.40);
+        --emerald-border: rgba(16, 185, 129, 0.45);
     }
 
     /* Tipografia e Fundo */
@@ -49,13 +49,12 @@ st.markdown("""
     .stApp { background-color: var(--bg-canvas); }
     
     .block-container { 
-        max-width: 800px; 
-        padding-top: 1rem; 
-        padding-bottom: 9.5rem; 
+        max-width: 740px !important; 
+        padding-top: 2rem; 
+        padding-bottom: 8.5rem; 
         margin: 0 auto; 
     }
 
-    /* Header Nativo Oculto */
     header[data-testid="stHeader"] {
         background: transparent !important;
         border: none !important;
@@ -65,7 +64,7 @@ st.markdown("""
     }
 
     /* ========================================================
-       BARRA LATERAL TOTALMENTE DESACOPLADA
+       SIDEBAR ESTÁTICA COM TOPO E RODAPÉ FIXOS
        ======================================================== */
     [data-testid="stSidebar"] {
         background-color: var(--sidebar-surface) !important;
@@ -73,113 +72,151 @@ st.markdown("""
         z-index: 100 !important;
     }
     [data-testid="stSidebar"] [data-testid="stSidebarContent"] {
-        padding: 0.6rem 0.8rem 1rem 0.8rem !important;
-        display: flex !important;
-        flex-direction: column !important;
-        height: 100vh !important;
+        background-color: var(--sidebar-surface) !important;
+        padding-top: 5rem !important;
+        padding-bottom: 7.5rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        overflow-y: auto !important;
     }
 
-    /* Topo Limpo e Fixo */
-    .sidebar-brand-box {
+    /* Header Fixo da Sidebar */
+    .sidebar-brand-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 18rem;
+        height: 4.8rem;
+        background: var(--sidebar-surface);
+        border-bottom: 1px solid var(--border-glass);
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding-bottom: 0.8rem;
-        margin-bottom: 0.6rem;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding: 0 1.2rem;
+        gap: 12px;
+        z-index: 110;
     }
     .brand-icon-box {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
         background: linear-gradient(135deg, #059669, #10B981);
-        border-radius: 8px;
+        border-radius: 9px;
         display: grid;
         place-items: center;
         font-weight: 700;
         color: #07090C;
-        font-size: 15px;
+        font-size: 17px;
+        box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
         flex-shrink: 0;
     }
+    .brand-text-col {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.15;
+    }
+    .brand-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #F8FAFC;
+        letter-spacing: -0.02em;
+    }
+    .brand-sub {
+        font-size: 0.65rem;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 700;
+        margin-top: 2px;
+    }
 
-    /* MINI-RAIL PERSISTENTE (APARECE QUANDO A BARRA LATERAL FECHA) */
-    .collapsed-mini-rail {
+    /* Rodapé Fixo da Sidebar */
+    .sidebar-dock-fixed {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 18rem;
+        height: 6.8rem;
+        background: linear-gradient(180deg, rgba(6, 7, 9, 0.85) 0%, #060709 35%);
+        border-top: 1px solid var(--border-glass);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding-left: 1.4rem;
+        gap: 12px;
+        z-index: 110;
+    }
+    .action-gear-btn {
+        font-size: 1.3rem;
+        color: #94A3B8;
+        cursor: pointer;
+        line-height: 1;
+        transition: transform 0.25s ease, color 0.2s ease;
+    }
+    .action-gear-btn:hover {
+        color: var(--emerald-primary);
+        transform: rotate(45deg);
+    }
+    .action-avatar-box {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: #10B981;
+        display: grid;
+        place-items: center;
+        position: relative;
+        cursor: pointer;
+        box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+    }
+    .avatar-inner-icon {
+        font-size: 1.1rem;
+        line-height: 1;
+    }
+    .avatar-live-indicator {
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #10B981;
+        border: 2px solid #060709;
+    }
+
+    /* Mini-Rail Recolhido */
+    .collapsed-rail-static {
         position: fixed;
         left: 0;
         top: 0;
         bottom: 0;
-        width: 52px;
+        width: 58px;
         background: var(--sidebar-surface);
         border-right: 1px solid var(--border-glass);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
-        padding: 52px 0 18px 0;
-        z-index: 40;
+        padding: 56px 0 20px 0;
+        z-index: 35;
     }
-    .rail-badge-top {
+    .rail-top-btn {
+        width: 34px;
+        height: 34px;
         background: var(--card-surface);
         border: 1px solid var(--emerald-border);
         border-radius: 8px;
-        width: 32px;
-        height: 32px;
         display: grid;
         place-items: center;
-        font-size: 0.95rem;
         color: var(--emerald-primary);
+        font-size: 0.95rem;
     }
-    .rail-dock-bottom {
+    .rail-bottom-stack {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 14px;
     }
 
-    /* Rodapé da Barra Lateral Expandida (Alinhado à Esquerda - Estilo Gemini) */
-    .sidebar-bottom-actions {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start !important;
-        padding-left: 10px !important;
-        gap: 14px;
-        padding-top: 16px;
-        margin-top: auto;
-        border-top: 1px solid var(--border-glass);
-    }
-    .action-gear {
-        font-size: 1.25rem;
-        color: var(--text-subtle);
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .action-gear:hover {
-        color: var(--emerald-primary);
-        transform: rotate(45deg);
-    }
-    .action-avatar {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #059669, #10B981);
-        display: grid;
-        place-items: center;
-        box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
-        cursor: pointer;
-        position: relative;
-    }
-    .avatar-icon { font-size: 1.05rem; }
-    .status-dot {
-        position: absolute;
-        bottom: 0px;
-        right: 0px;
-        width: 9px;
-        height: 9px;
-        border-radius: 50%;
-        background: #10B981;
-        border: 1.5px solid var(--sidebar-surface);
-    }
-
-    /* Linhas de Documentos da Sidebar */
+    /* Linhas dos Documentos */
     .doc-row {
         display: flex;
         align-items: center;
@@ -222,57 +259,25 @@ st.markdown("""
     .metric-title { font-size: 0.68rem; text-transform: uppercase; color: var(--text-subtle); font-weight: 700; letter-spacing: 0.08em; }
     .metric-val { font-size: 1.1rem; font-weight: 700; color: var(--text-headline); margin-top: 2px; }
 
-    /* HERO STATE */
-    .hero-wrapper {
-        text-align: center;
-        padding: 1.5rem 1rem 1.2rem;
+    /* Saudação Minimalista */
+    .greeting-container {
+        padding: 3.5rem 0.2rem 2.2rem 0.2rem;
+        text-align: left;
     }
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: var(--emerald-glow);
-        border: 1px solid var(--emerald-border);
-        color: var(--emerald-primary);
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        margin-bottom: 0.8rem;
-    }
-    .hero-title {
-        font-size: 1.85rem;
-        font-weight: 700;
-        letter-spacing: -0.03em;
-        color: var(--text-headline);
+    .greeting-kicker {
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: #34D399;
         margin-bottom: 0.4rem;
+        letter-spacing: -0.01em;
     }
-    .hero-desc {
-        color: var(--text-body);
-        font-size: 0.88rem;
-        max-width: 520px;
-        margin: 0 auto 1.4rem;
-        line-height: 1.5;
+    .greeting-heading {
+        font-size: 2.25rem;
+        font-weight: 600;
+        letter-spacing: -0.035em;
+        color: #F8FAFC;
+        line-height: 1.2;
     }
-
-    .kpi-ribbon {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        max-width: 560px;
-        margin: 0 auto 1.8rem;
-    }
-    .kpi-card {
-        background: var(--card-surface);
-        border: 1px solid var(--border-glass);
-        border-radius: 10px;
-        padding: 10px 12px;
-        text-align: center;
-    }
-    .kpi-card .num { font-size: 1.05rem; font-weight: 700; color: var(--text-headline); }
-    .kpi-card .label { font-size: 0.70rem; color: var(--text-subtle); margin-top: 2px; }
 
     /* Mensagens do Chat */
     [data-testid="stChatMessage"] {
@@ -314,11 +319,10 @@ st.markdown("""
         margin-top: 14px;
         border-top: 1px solid var(--border-glass);
     }
-    .executive-telemetry span strong { color: var(--text-body); }
     .executive-cost { color: var(--emerald-primary); font-weight: 600; }
 
     /* =========================================================================
-       CÁPSULA PERPLEXITY DOCK: 800px COM POSICIONAMENTO RIGOROSO DOS 4 ELEMENTOS
+       CÁPSULA PERPLEXITY DOCK: COMPACTA (740px) E COM CONTROLOS DA DIREITA UNIDOS
        ========================================================================= */
     div[data-testid="stBottom"] {
         background: transparent !important;
@@ -327,182 +331,141 @@ st.markdown("""
     div[data-testid="stBottom"] > div {
         background: transparent !important;
         border: none !important;
-        box-shadow: none !important;
-        max-width: 800px !important;
+        max-width: 740px !important;
         margin: 0 auto 16px auto !important;
         padding: 0 !important;
-        position: relative !important;
     }
 
-    /* O Frame Único da Cápsula com 52px de Altura */
-    div[data-testid="stBottom"] [data-testid="stVerticalBlock"] {
-        position: relative !important;
-        width: 100% !important;
-        max-width: 800px !important;
-        height: 52px !important;
-        min-height: 52px !important;
-        max-height: 52px !important;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        background: #111418 !important;
+    /* O CONTAINER DE COLUNAS É A PRÓPRIA CÁPSULA COM PADDING COMPACTO */
+    div[data-testid="stBottom"] div[data-testid="stHorizontalBlock"] {
+        background: #0D1014 !important;
         border: 1.5px solid var(--emerald-border) !important;
-        border-radius: 28px !important;
-        box-shadow: 0 0 24px rgba(16, 185, 129, 0.16), 0 8px 32px rgba(0, 0, 0, 0.7) !important;
+        border-radius: 32px !important;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.16), 0 8px 30px rgba(0, 0, 0, 0.85) !important;
+        padding: 3px 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
         box-sizing: border-box !important;
-        transition: all 0.22s ease-in-out !important;
+        gap: 2px !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
     }
-    div[data-testid="stBottom"] [data-testid="stVerticalBlock"]:focus-within {
-        border-color: rgba(16, 185, 129, 0.85) !important;
-        box-shadow: 0 0 32px rgba(16, 185, 129, 0.26), 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+    div[data-testid="stBottom"] div[data-testid="stHorizontalBlock"]:focus-within {
+        border-color: rgba(16, 185, 129, 0.9) !important;
+        box-shadow: 0 0 28px rgba(16, 185, 129, 0.28), 0 10px 40px rgba(0, 0, 0, 0.9) !important;
     }
 
-    /* 1. Botão '+' Embutido na Esquerda Interna */
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type {
-        position: absolute !important;
-        left: 14px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        z-index: 30 !important;
-        width: 32px !important;
-        height: 32px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type button {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+    /* 1. Botão '+' Popover da esquerda */
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:first-child button {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: var(--emerald-primary) !important;
-        font-size: 1.45rem !important;
-        font-weight: 300 !important;
-        width: 32px !important;
-        height: 32px !important;
+        font-size: 1.2rem !important;
+        width: 34px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        border-radius: 50% !important;
         padding: 0 !important;
         display: grid !important;
         place-items: center !important;
-        border-radius: 50% !important;
-        transition: all 0.18s ease !important;
+        margin: 0 !important;
+        transition: all 0.2s ease !important;
     }
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type button svg {
-        display: none !important; /* Remove a setinha ▾ do popover */
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:first-child button svg {
+        display: none !important;
     }
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):first-of-type button:hover {
-        background: rgba(16, 185, 129, 0.18) !important;
-        color: #34D399 !important;
-        transform: scale(1.1) !important;
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:first-child button:hover {
+        background: rgba(16, 185, 129, 0.2) !important;
+        border-color: var(--emerald-border) !important;
+        transform: scale(1.06) !important;
     }
 
-    /* 2. Campo de Chat Preenchendo Toda a Cápsula com Recuos Perfeitos */
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stChatInput"]) {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        z-index: 10 !important;
-    }
-    div[data-testid="stBottom"] [data-testid="stChatInput"] {
+    /* 2. Campo de Chat Central Transparente */
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(2) div[data-testid="stChatInput"],
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(2) div[data-testid="stChatInput"] > div {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
         width: 100% !important;
-        height: 100% !important;
     }
-    div[data-testid="stBottom"] [data-testid="stChatInput"] > div {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-    }
-    div[data-testid="stBottom"] [data-testid="stChatInput"] textarea {
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(2) div[data-testid="stChatInput"] textarea {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         color: #F8FAFC !important;
-        font-size: 0.92rem !important;
-        height: 50px !important;
-        min-height: 50px !important;
-        max-height: 50px !important;
-        padding-left: 52px !important;     /* Folga confortável após o '+' */
-        padding-right: 175px !important;   /* Folga antes do botão de modelo e envio */
-        padding-top: 13px !important;
-        padding-bottom: 13px !important;
-        box-sizing: border-box !important;
+        font-size: 0.90rem !important;
+        padding: 8px 6px !important;
+        min-height: 36px !important;
+        max-height: 70px !important;
     }
 
-    /* Seta de Envio Nativa Fixada à Direita Interna */
-    div[data-testid="stBottom"] [data-testid="stChatInputSubmitButton"] {
-        position: absolute !important;
-        right: 14px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        z-index: 30 !important;
+    /* Remove o botão cinza nativo duplicado */
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(2) div[data-testid="stChatInputSubmitButton"],
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(2) button[data-testid="stChatInputSubmitButton"] {
+        display: none !important;
+        visibility: hidden !important;
     }
 
-    /* 3. Seletor de Modelo Posicionado Antes da Seta de Envio */
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):last-of-type {
-        position: absolute !important;
-        right: 50px !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important;
-        z-index: 30 !important;
-        width: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):last-of-type button {
+    /* 3. Seletor de Modelo Compacto e Colado ao Botão de Envio */
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(3) button {
         background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         color: #CBD5E1 !important;
-        font-size: 0.74rem !important;
+        font-size: 0.72rem !important;
         font-weight: 600 !important;
-        height: 28px !important;
-        padding: 0 9px !important;
-        border-radius: 6px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 0 8px !important;
+        border-radius: 8px !important;
         display: flex !important;
         align-items: center !important;
-        gap: 4px !important;
+        justify-content: center !important;
         white-space: nowrap !important;
-        transition: all 0.18s ease !important;
+        margin: 0 2px 0 0 !important;
+        transition: all 0.2s ease !important;
     }
-    div[data-testid="stBottom"] [data-testid="element-container"]:has([data-testid="stPopover"]):last-of-type button:hover {
-        background: rgba(16, 185, 129, 0.14) !important;
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:nth-child(3) button:hover {
+        background: rgba(16, 185, 129, 0.16) !important;
         border-color: var(--emerald-border) !important;
         color: var(--emerald-primary) !important;
     }
 
-    /* Menus Suspensos (Popovers) */
+    /* 4. Botão de Envio Verde (↑) */
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:last-child button {
+        background: var(--emerald-primary) !important;
+        color: #060709 !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        font-size: 1.05rem !important;
+        font-weight: 700 !important;
+        display: grid !important;
+        place-items: center !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) !important;
+        transition: all 0.18s ease !important;
+    }
+    div[data-testid="stBottom"] div[data-testid="stColumn"]:last-child button:hover {
+        background: #34D399 !important;
+        transform: scale(1.06) !important;
+    }
+
+    /* Menus Suspensos / Popovers */
     [data-testid="stPopoverBody"] {
         background-color: var(--menu-surface) !important;
         border: 1px solid var(--border-glass) !important;
-        border-radius: 14px !important;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85) !important;
         padding: 1.1rem !important;
         min-width: 320px !important;
     }
     .popover-header { font-size: 0.82rem; font-weight: 700; color: #F8FAFC; margin-bottom: 2px; }
     .popover-desc { font-size: 0.70rem; color: #94A3B8; margin-bottom: 10px; line-height: 1.4; }
-
-    .scope-status-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid var(--emerald-border);
-        color: var(--emerald-primary);
-        padding: 3px 10px;
-        border-radius: 14px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        margin-bottom: 8px;
-    }
 
     /* Botões da Sidebar */
     [data-testid="stSidebar"] button {
@@ -564,7 +527,7 @@ OPCOES_MODELOS = {
     }
 }
 
-# 6. Estado da Sessão & Controle de Seleção Múltipla
+# 6. Estado da Sessão & Controle de Fontes
 if "mensagens" not in st.session_state:
     st.session_state.mensagens = []
 
@@ -581,7 +544,6 @@ for k in FONTES_DISPONIVEIS:
     if f"chk_{k}" not in st.session_state:
         st.session_state[f"chk_{k}"] = True
 
-# Callbacks para Sincronização Perfeita da Chave Mestra
 def ao_mudar_master_todas():
     novo_valor = st.session_state.chk_todas
     if novo_valor:
@@ -608,21 +570,15 @@ pergunta_para_processar = None
 PASTA_DATA = Path("data")
 PASTA_DATA.mkdir(exist_ok=True)
 
-def listar_documentos() -> list[Path]:
-    return sorted(
-        [f for f in PASTA_DATA.iterdir() if f.is_file() and f.suffix.lower() in [".pdf", ".md"]],
-        key=lambda f: f.name.lower()
-    )
-
-# 7. Mini-Rail Visível Quando a Barra Lateral é Recolhida (Estilo Gemini)
+# 7. Mini-Rail Visível Quando a Barra Lateral é Recolhida
 st.markdown("""
-<div class="collapsed-mini-rail">
-    <div class="rail-badge-top" title="AskData">⚡</div>
-    <div class="rail-dock-bottom">
-        <div class="action-gear" title="Configurações">⚙️</div>
-        <div class="action-avatar" title="Usuário Ativo">
-            <span class="avatar-icon">🤖</span>
-            <span class="status-dot"></span>
+<div class="collapsed-rail-static">
+    <div class="rail-top-btn" title="AskData">⚡</div>
+    <div class="rail-bottom-stack">
+        <div class="action-gear-btn" title="Configurações">⚙️</div>
+        <div class="action-avatar-box" title="Usuário Ativo">
+            <span class="avatar-inner-icon">🤖</span>
+            <span class="avatar-live-indicator"></span>
         </div>
     </div>
 </div>
@@ -630,13 +586,13 @@ st.markdown("""
 
 # 8. Barra Lateral Expandida
 with st.sidebar:
-    # Topo Estático e Limpo (Sem margem negativa, sem oscilação)
+    # Topo Fixo e Estático: AskData ENTERPRISE
     st.markdown("""
-    <div class="sidebar-brand-box">
+    <div class="sidebar-brand-fixed">
         <div class="brand-icon-box">⚡</div>
-        <div>
-            <div style="font-weight: 700; font-size: 0.95rem; letter-spacing: -0.02em; color: #F8FAFC;">AskData</div>
-            <div style="font-size: 0.65rem; color: #64748B; text-transform: uppercase; letter-spacing: 0.08em;">Enterprise Workspace</div>
+        <div class="brand-text-col">
+            <span class="brand-title">AskData</span>
+            <span class="brand-sub">ENTERPRISE WORKSPACE</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -661,14 +617,14 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    # Slider Oficial de Top-K Chunks (Exigência Dia 09)
+    # Slider Oficial de Top-K Chunks
     st.markdown('<div style="font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748B; margin: 1.2rem 0 0.4rem;">Profundidade de Busca (Top-K Chunks)</div>', unsafe_allow_html=True)
     top_k_chunks = st.slider(
         "Quantidade de Chunks recuperados:",
         min_value=2,
         max_value=6,
         value=4,
-        help="Quantidade de fragmentos semânticos resgatados do ChromaDB via similaridade de cosseno."
+        help="Quantidade de fragmentos resgatados do ChromaDB via similaridade de cosseno."
     )
 
     # Consultas Recentes
@@ -695,21 +651,25 @@ with st.sidebar:
                 use_container_width=True
             )
 
-    # Rodapé da Barra Lateral Expandida (Estilo Gemini: Alinhado à Esquerda)
+    # Rodapé Fixo e Estático: Engrenagem e Avatar
     st.markdown("""
-    <div class="sidebar-bottom-actions">
-        <div class="action-gear" title="Configurações">⚙️</div>
-        <div class="action-avatar" title="Usuário Ativo">
-            <span class="avatar-icon">🤖</span>
-            <span class="status-dot"></span>
+    <div class="sidebar-dock-fixed">
+        <div class="action-gear-btn" title="Configurações do Sistema">⚙️</div>
+        <div class="action-avatar-box" title="Usuário Ativo">
+            <span class="avatar-inner-icon">🤖</span>
+            <span class="avatar-live-indicator"></span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# 9. Área Central: Hero com KPIs em String Contínua (Sem Quebra de Código)
+# 9. Área Central: Saudação Minimalista Estilo Gemini/Claude
 if not st.session_state.mensagens:
-    hero_html = '<div class="hero-wrapper"><div class="hero-badge">✦ Base de Conhecimento Auditada · Zero Alucinações</div><div class="hero-title">Consulte sua documentação técnica com precisão imediata.</div><div class="hero-desc">Respostas fundamentadas exclusivamente em manuais institucionais, com citação auditável de página e isolamento estrito por metadados.</div><div class="kpi-ribbon"><div class="kpi-card"><div class="num">4 Documentos</div><div class="label">Bases Homologadas</div></div><div class="kpi-card"><div class="num">73 Páginas</div><div class="label">477 Vetores Ativos</div></div><div class="kpi-card"><div class="num" style="color: #10B981;">100% Factual</div><div class="label">Taxa de Confiabilidade</div></div></div></div>'
-    st.markdown(hero_html, unsafe_allow_html=True)
+    st.markdown("""
+    <div class="greeting-container">
+        <div class="greeting-kicker">Workspace</div>
+        <div class="greeting-heading">No que vamos trabalhar?</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     st.markdown('<div style="font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748B; margin-bottom: 0.8rem;">Consultas Estratégicas Frequentes</div>', unsafe_allow_html=True)
     c1, c2 = st.columns(2)
@@ -768,91 +728,79 @@ else:
                             st.caption(f['texto'])
                             st.markdown("---")
 
-# 10. Gestão do Escopo de Fontes Selecionadas
+# 10. Gestão do Escopo de Fontes
 arquivos_para_filtro = [FONTES_DISPONIVEIS[k]["arquivo"] for k in st.session_state.fontes_ativas]
 
 if len(st.session_state.fontes_ativas) == len(FONTES_DISPONIVEIS):
     rotulo_escopo_atual = "Toda a Base (Pesquisa Global)"
-    tag_escopo_html = ""
 elif len(st.session_state.fontes_ativas) == 0:
     rotulo_escopo_atual = "Nenhuma fonte selecionada"
-    tag_escopo_html = '<div class="scope-status-pill" style="color: #F87171; border-color: rgba(248, 113, 113, 0.4);">⚠️ Nenhuma fonte ativa</div>'
 else:
     nomes_selecionados = [FONTES_DISPONIVEIS[k]["titulo"] for k in st.session_state.fontes_ativas]
     rotulo_escopo_atual = ", ".join(nomes_selecionados)
-    tag_escopo_html = f'<div class="scope-status-pill"><span>🎯 Foco Ativo: {len(st.session_state.fontes_ativas)} documento(s) selecionado(s)</span></div>'
 
-if tag_escopo_html:
-    st.markdown(tag_escopo_html, unsafe_allow_html=True)
-
-# 11. CÁPSULA PERPLEXITY UNIFICADA (800px COM '+' NA ESQ E MODELO NA DIR)
+# 11. CÁPSULA PERPLEXITY DOCK: COMPACTA E COM ELEMENTOS AGRUPADOS NA DIREITA
 with st.bottom:
-    # 1. BOTÃO '+' (SELETOR DE FONTES - SEM TOOLTIP E SEM BORDA QUADRADA)
-    with st.popover("＋"):
-        st.markdown('<div class="popover-header">Fontes de Consulta</div>', unsafe_allow_html=True)
-        st.markdown('<div class="popover-desc">Selecione uma ou mais bases para direcionar a busca semântica:</div>', unsafe_allow_html=True)
+    col_add, col_input, col_model, col_send = st.columns([0.05, 0.77, 0.13, 0.05])
 
-        st.checkbox(
-            "Selecionar todas as fontes",
-            value=st.session_state.chk_todas,
-            key="chk_todas",
-            on_change=ao_mudar_master_todas
-        )
+    with col_add:
+        with st.popover("＋"):
+            st.markdown('<div class="popover-header">Fontes de Consulta</div>', unsafe_allow_html=True)
+            st.markdown('<div class="popover-desc">Selecione as bases para direcionar a busca semântica:</div>', unsafe_allow_html=True)
 
-        st.markdown('<div style="height: 4px;"></div><hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 8px 0;"><div style="height: 4px;"></div>', unsafe_allow_html=True)
-        st.markdown('<div style="font-size: 0.68rem; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;">Documentos Homologados</div>', unsafe_allow_html=True)
-
-        for k, v in FONTES_DISPONIVEIS.items():
             st.checkbox(
-                f"{v['titulo']} ({v['paginas']} págs)",
-                value=st.session_state[f"chk_{k}"],
-                key=f"chk_{k}",
-                on_change=ao_mudar_individual,
-                args=(k,)
+                "Selecionar todas as fontes",
+                value=st.session_state.chk_todas,
+                key="chk_todas",
+                on_change=ao_mudar_master_todas
             )
 
-        st.markdown('<div style="height: 4px;"></div><hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 8px 0;"><div style="height: 4px;"></div>', unsafe_allow_html=True)
-        st.markdown('<div class="popover-header" style="font-size: 0.78rem;">Adicionar Novo Documento</div>', unsafe_allow_html=True)
-        arquivo_up = st.file_uploader("Upload de PDF ou MD:", type=["pdf", "md"], label_visibility="collapsed")
-        if arquivo_up:
-            if st.button("Sincronizar Arquivo", use_container_width=True):
-                caminho = PASTA_DATA / arquivo_up.name
-                with open(caminho, "wb") as f:
-                    f.write(arquivo_up.getvalue())
-                
-                with st.status("Processando documento...", expanded=True) as status:
-                    st.write("Extraindo páginas nativas...")
-                    time.sleep(0.3)
-                    st.write("Verificando integridade no ChromaDB...")
-                    time.sleep(0.4)
-                    status.update(label="Documento sincronizado com sucesso!", state="complete", expanded=False)
-                
-                st.success(f"'{arquivo_up.name}' pronto para pesquisa!")
-                time.sleep(0.8)
-                st.rerun()
+            st.markdown('<hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 8px 0;">', unsafe_allow_html=True)
+            for k, v in FONTES_DISPONIVEIS.items():
+                st.checkbox(
+                    f"{v['titulo']} ({v['paginas']} págs)",
+                    value=st.session_state[f"chk_{k}"],
+                    key=f"chk_{k}",
+                    on_change=ao_mudar_individual,
+                    args=(k,)
+                )
 
-    # 2. CAMPO DE DIGITAÇÃO NO CENTRO
-    prompt_digitado = st.chat_input("Consulte qualquer norma, procedimento ou técnica...")
+            st.markdown('<hr style="border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 8px 0;">', unsafe_allow_html=True)
+            arquivo_up = st.file_uploader("Upload de PDF ou MD:", type=["pdf", "md"], label_visibility="collapsed")
+            if arquivo_up:
+                if st.button("Sincronizar Arquivo", use_container_width=True):
+                    caminho = PASTA_DATA / arquivo_up.name
+                    with open(caminho, "wb") as f:
+                        f.write(arquivo_up.getvalue())
+                    st.success(f"'{arquivo_up.name}' pronto para pesquisa!")
+                    time.sleep(0.6)
+                    st.rerun()
 
-    # 3. SELETOR DE MODELO À DIREITA (ANTES DA SETA DE ENVIO)
-    modelo_atual_info = OPCOES_MODELOS[st.session_state.modelo_selecionado]
-    with st.popover(f"⚡ {modelo_atual_info['label']} ▾"):
-        st.markdown('<div class="popover-header">Modelo de Linguagem</div>', unsafe_allow_html=True)
-        st.markdown('<div class="popover-desc">Roteamento de inferência e capacidade analítica:</div>', unsafe_allow_html=True)
+    with col_input:
+        prompt_digitado = st.chat_input("Consulte qualquer norma, procedimento ou técnica...")
 
-        for chave_mod, dados_mod in OPCOES_MODELOS.items():
-            escolhido = (chave_mod == st.session_state.modelo_selecionado)
-            prefixo = "✓ " if escolhido else "○ "
-            if st.button(
-                f"{prefixo}{dados_mod['label']} · {dados_mod['status']}\n{dados_mod['subtitulo']}", 
-                key=f"mod_btn_{chave_mod}", 
-                use_container_width=True
-            ):
-                st.session_state.modelo_selecionado = chave_mod
-                st.rerun()
+    with col_model:
+        modelo_atual_info = OPCOES_MODELOS[st.session_state.modelo_selecionado]
+        with st.popover(f"⚡ {modelo_atual_info['label']} ▾"):
+            st.markdown('<div class="popover-header">Modelo de Linguagem</div>', unsafe_allow_html=True)
+            for chave_mod, dados_mod in OPCOES_MODELOS.items():
+                escolhido = (chave_mod == st.session_state.modelo_selecionado)
+                prefixo = "✓ " if escolhido else "○ "
+                if st.button(
+                    f"{prefixo}{dados_mod['label']} · {dados_mod['status']}", 
+                    key=f"mod_btn_{chave_mod}", 
+                    use_container_width=True
+                ):
+                    st.session_state.modelo_selecionado = chave_mod
+                    st.rerun()
 
-# 12. Processamento da Pergunta
+    with col_send:
+        enviar_clicado = st.button("↑", key="btn_submit_dock")
+
+# 12. Processamento da Pergunta e Invocação do RAG
 if prompt_digitado:
+    pergunta_para_processar = prompt_digitado
+elif enviar_clicado and prompt_digitado:
     pergunta_para_processar = prompt_digitado
 
 if pergunta_para_processar:
